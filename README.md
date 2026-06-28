@@ -1,5 +1,5 @@
-# Topaz Offline Downloader Server
-Topaz Offline Downloader Server is where you can install Topaz Giga Pixel and Topaz Photo without having any internet.
+# Topaz Offline Download Server
+Topaz Offline Download Server is where you can install Topaz Giga Pixel and Topaz Photo without having any internet.
 
 Including software that is no longer supported.
 
