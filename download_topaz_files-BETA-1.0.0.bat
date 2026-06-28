@@ -1,26 +1,80 @@
 @echo off
-@echo should contain 325 files, not 216 files.
+title Topaz Model Downloader
+setlocal
+
+set "STARTTIME=%TIME%"
+
+echo ===========================================
+echo         Topaz Model 1.0.1 Downloader
+echo ===========================================
+echo.
+
+set "DEST=C:\TopazMirror\v1"
+
+if not exist "%DEST%" (
+    echo Creating "%DEST%"...
+    mkdir "%DEST%"
+    if errorlevel 1 (
+        echo.
+        echo ERROR: Unable to create "%DEST%"
+        pause
+        exit /b 1
+    )
+)
+
+cd /d "%DEST%"
+
+echo Download folder:
+echo %CD%
+echo.
+@echo off
+
+echo Checking network...
+
+netsh interface show interface | findstr /i "Connected" >nul
+
+if errorlevel 1 (
+    echo [OFFLINE] No Ethernet or Wi-Fi adapter connected.
+    goto START_DOWNLOAD
+)
+
+curl --silent --head --connect-timeout 5 http://models.topazlabs.com >nul 2>&1
+
+if errorlevel 1 (
+    echo [OFFLINE] Adapter connected, but Internet unavailable.
+) else (
+    echo [ONLINE] Internet detected.
+)
+
+:START_DOWNLOAD
+
+echo.
+echo ===========================================
+echo          Network check complete.
+echo      Starting download in 3 seconds...
+echo ===========================================
+timeout /t 3 /nobreak >nul
+echo.
 
 setlocal
+
+mkdir "C:\TopazMirror" 2>nul
+
 mkdir "C:\TopazMirror\v1" 2>nul
 
 mkdir "C:\TopazMirror\_test" 2>nul
-if not exist > "C:\TopazMirror\_test\models-bal-test.txt" (
-    > "C:\TopazMirror\_test\models-bal-test.txt" echo Connected!
+if not exist "C:\TopazMirror\_test\models-bal-test.txt" (
+    echo Connected!>"C:\TopazMirror\_test\models-bal-test.txt"
 )
 
 mkdir "C:\TopazMirror\1.1" 2>nul
-if not exist > "C:\TopazMirror\1.1\test.txt" (
-    > "C:\TopazMirror\1.1\test.txt echo Connected!
+if not exist "C:\TopazMirror\1.1\test.txt" (
+    echo Connected!>"C:\TopazMirror\1.1\test.txt"
 )
 
 mkdir "C:\TopazMirror\v1\track" 2>nul
-if not exist > "C:\TopazMirror\1.1\track\OK.txt" (
-	> "C:\TopazMirror\1.1\track\OK.txt echo OK
-
-
-if not exist "C:\TopazMirror\v1\manifest.json" (
-    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\manifest.json" "http://models.topazlabs.com/v1/manifest.json"
+if not exist "C:\TopazMirror\v1\track\OK.txt" (
+    echo OK>"C:\TopazMirror\v1\track\OK.txt"
 )
 
 if not exist "C:\TopazMirror\v1\apnb-v2-fp16-512x512-rev2-ox.tz2" (
@@ -35,8 +89,16 @@ if not exist "C:\TopazMirror\v1\apnb-v2-fp32-512x512-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\apnb-v2-fp32-512x512-ox.tz2" "http://models.topazlabs.com/v1/apnb-v2-fp32-512x512-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\claa-v1-fp32-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\claa-v1-fp32-512x512-ov.tz" "http://models.topazlabs.com/v1/claa-v1-fp32-512x512-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\claa-v1-fp32-512x512-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\claa-v1-fp32-512x512-ov.tz2" "http://models.topazlabs.com/v1/claa-v1-fp32-512x512-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\claa-v1-fp32-512x512-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\claa-v1-fp32-512x512-ox.tz" "http://models.topazlabs.com/v1/claa-v1-fp32-512x512-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\claa-v1-fp32-512x512-ox.tz2" (
@@ -61,6 +123,10 @@ if not exist "C:\TopazMirror\v1\clc-v3-fp16-512x512-ox.tz2" (
 
 if not exist "C:\TopazMirror\v1\clc-v3-fp32-512x512-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\clc-v3-fp32-512x512-ox.tz2" "http://models.topazlabs.com/v1/clc-v3-fp32-512x512-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\daclip-v1-fp32-224x224-1x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\daclip-v1-fp32-224x224-1x-ov.tz" "http://models.topazlabs.com/v1/daclip-v1-fp32-224x224-1x-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\daclip-v3-fp16-256x256-rev1-ox.tz2" (
@@ -111,12 +177,24 @@ if not exist "C:\TopazMirror\v1\dswn_dec-v1-fp32-128x128-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\dswn_dec-v1-fp32-128x128-ox.tz2" "http://models.topazlabs.com/v1/dswn_dec-v1-fp32-128x128-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\dswn_dec-v1-fp32-128x128.onnx.data" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\dswn_dec-v1-fp32-128x128.onnx.data" "http://models.topazlabs.com/v1/dswn_dec-v1-fp32-128x128.onnx.data"
+)
+
 if not exist "C:\TopazMirror\v1\dswn_dit-v1-fp16-128x128-rev1-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\dswn_dit-v1-fp16-128x128-rev1-ox.tz2" "http://models.topazlabs.com/v1/dswn_dit-v1-fp16-128x128-rev1-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\dswn_dit-v1-fp16-128x128-rev1.onnx.data" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\dswn_dit-v1-fp16-128x128-rev1.onnx.data" "http://models.topazlabs.com/v1/dswn_dit-v1-fp16-128x128-rev1.onnx.data"
+)
+
 if not exist "C:\TopazMirror\v1\dswn_enc-v1-fp32-1024x1024-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\dswn_enc-v1-fp32-1024x1024-ox.tz2" "http://models.topazlabs.com/v1/dswn_enc-v1-fp32-1024x1024-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\dswn_enc-v1-fp32-1024x1024.onnx.data" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\dswn_enc-v1-fp32-1024x1024.onnx.data" "http://models.topazlabs.com/v1/dswn_enc-v1-fp32-1024x1024.onnx.data"
 )
 
 if not exist "C:\TopazMirror\v1\expog-v1-fp16-512x512-1x-ov.tz2" (
@@ -135,16 +213,32 @@ if not exist "C:\TopazMirror\v1\expoi-v1-fp32-256x256-1x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\expoi-v1-fp32-256x256-1x-ox.tz2" "http://models.topazlabs.com/v1/expoi-v1-fp32-256x256-1x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gclc-v1-fp16-128x128-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp16-128x128-2x-ov.tz" "http://models.topazlabs.com/v1/gclc-v1-fp16-128x128-2x-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gclc-v1-fp16-128x128-2x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp16-128x128-2x-ov.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp16-128x128-2x-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gclc-v1-fp16-128x128-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp16-128x128-4x-ov.tz" "http://models.topazlabs.com/v1/gclc-v1-fp16-128x128-4x-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gclc-v1-fp16-128x128-4x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp16-128x128-4x-ov.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp16-128x128-4x-ov.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gclc-v1-fp16-192x192-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp16-192x192-2x-ov.tz" "http://models.topazlabs.com/v1/gclc-v1-fp16-192x192-2x-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gclc-v1-fp16-192x192-2x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp16-192x192-2x-ov.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp16-192x192-2x-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gclc-v1-fp16-192x192-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp16-192x192-4x-ov.tz" "http://models.topazlabs.com/v1/gclc-v1-fp16-192x192-4x-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gclc-v1-fp16-192x192-4x-ov.tz2" (
@@ -159,12 +253,24 @@ if not exist "C:\TopazMirror\v1\gclc-v1-fp16-96x96-4x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp16-96x96-4x-ov.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp16-96x96-4x-ov.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gclc-v1-fp32-128x128-2x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-128x128-2x-ox.tz" "http://models.topazlabs.com/v1/gclc-v1-fp32-128x128-2x-ox.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gclc-v1-fp32-128x128-2x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-128x128-2x-ox.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp32-128x128-2x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gclc-v1-fp32-128x128-4x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-128x128-4x-ox.tz" "http://models.topazlabs.com/v1/gclc-v1-fp32-128x128-4x-ox.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gclc-v1-fp32-128x128-4x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-128x128-4x-ox.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp32-128x128-4x-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gclc-v1-fp32-192x192-1x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-192x192-1x-ov.tz" "http://models.topazlabs.com/v1/gclc-v1-fp32-192x192-1x-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gclc-v1-fp32-192x192-1x-ov.tz2" (
@@ -175,12 +281,20 @@ if not exist "C:\TopazMirror\v1\gclc-v1-fp32-192x192-1x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-192x192-1x-ox.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp32-192x192-1x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gclc-v1-fp32-192x192-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-192x192-2x-ov.tz" "http://models.topazlabs.com/v1/gclc-v1-fp32-192x192-2x-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gclc-v1-fp32-192x192-2x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-192x192-2x-ov.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp32-192x192-2x-ov.tz2"
 )
 
 if not exist "C:\TopazMirror\v1\gclc-v1-fp32-192x192-2x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-192x192-2x-ox.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp32-192x192-2x-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gclc-v1-fp32-192x192-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-192x192-4x-ov.tz" "http://models.topazlabs.com/v1/gclc-v1-fp32-192x192-4x-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gclc-v1-fp32-192x192-4x-ov.tz2" (
@@ -199,12 +313,24 @@ if not exist "C:\TopazMirror\v1\gclc-v1-fp32-96x96-4x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gclc-v1-fp32-96x96-4x-ox.tz2" "http://models.topazlabs.com/v1/gclc-v1-fp32-96x96-4x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gde-v1-fp32-192x192-1x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gde-v1-fp32-192x192-1x-ov.tz" "http://models.topazlabs.com/v1/gde-v1-fp32-192x192-1x-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gde-v1-fp32-192x192-1x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gde-v1-fp32-192x192-1x-ov.tz2" "http://models.topazlabs.com/v1/gde-v1-fp32-192x192-1x-ov.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gde-v1-fp32-192x192-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gde-v1-fp32-192x192-2x-ov.tz" "http://models.topazlabs.com/v1/gde-v1-fp32-192x192-2x-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gde-v1-fp32-192x192-2x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gde-v1-fp32-192x192-2x-ov.tz2" "http://models.topazlabs.com/v1/gde-v1-fp32-192x192-2x-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gde-v1-fp32-192x192-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gde-v1-fp32-192x192-4x-ov.tz" "http://models.topazlabs.com/v1/gde-v1-fp32-192x192-4x-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gde-v1-fp32-192x192-4x-ov.tz2" (
@@ -225,6 +351,22 @@ if not exist "C:\TopazMirror\v1\gde-v2-fp32-192x192-4x-ox.tz2" (
 
 if not exist "C:\TopazMirror\v1\gde_ap-v1-fp16-64x64-rev2-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gde_ap-v1-fp16-64x64-rev2-ox.tz2" "http://models.topazlabs.com/v1/gde_ap-v1-fp16-64x64-rev2-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gde_ap-v1-fp32-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gde_ap-v1-fp32-64x64-ov.tz" "http://models.topazlabs.com/v1/gde_ap-v1-fp32-64x64-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\gendet-v1-fp32-256x256-1x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gendet-v1-fp32-256x256-1x-ov.tz" "http://models.topazlabs.com/v1/gendet-v1-fp32-256x256-1x-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\gendet-v1-fp32-256x256-1x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gendet-v1-fp32-256x256-1x-ox.tz" "http://models.topazlabs.com/v1/gendet-v1-fp32-256x256-1x-ox.tz"
+)
+
+if not exist "C:\TopazMirror\v1\gfclc-v1-fp32-512x512-ov-11.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfclc-v1-fp32-512x512-ov-11.tz" "http://models.topazlabs.com/v1/gfclc-v1-fp32-512x512-ov-11.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gfclc-v1-fp32-512x512-ov-11.tz2" (
@@ -271,8 +413,16 @@ if not exist "C:\TopazMirror\v1\gfpf-v1-fp32-48x48-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfpf-v1-fp32-48x48-ox.tz2" "http://models.topazlabs.com/v1/gfpf-v1-fp32-48x48-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gfrf-v2-fp16-1024x1024-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfrf-v2-fp16-1024x1024-ov.tz" "http://models.topazlabs.com/v1/gfrf-v2-fp16-1024x1024-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gfrf-v2-fp16-1024x1024-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfrf-v2-fp16-1024x1024-ov.tz2" "http://models.topazlabs.com/v1/gfrf-v2-fp16-1024x1024-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gfrf-v2-fp32-1024x1024-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfrf-v2-fp32-1024x1024-ox.tz" "http://models.topazlabs.com/v1/gfrf-v2-fp32-1024x1024-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gfrf-v2-fp32-1024x1024-ox.tz2" (
@@ -283,8 +433,16 @@ if not exist "C:\TopazMirror\v1\gfrfn-v3-fp32-1024x1024-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfrfn-v3-fp32-1024x1024-ox.tz2" "http://models.topazlabs.com/v1/gfrfn-v3-fp32-1024x1024-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gfrg-v3-fp16-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfrg-v3-fp16-512x512-ov.tz" "http://models.topazlabs.com/v1/gfrg-v3-fp16-512x512-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gfrg-v3-fp16-512x512-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfrg-v3-fp16-512x512-ov.tz2" "http://models.topazlabs.com/v1/gfrg-v3-fp16-512x512-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gfrg-v3-fp32-512x512-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gfrg-v3-fp32-512x512-ox.tz" "http://models.topazlabs.com/v1/gfrg-v3-fp32-512x512-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gfrg-v3-fp32-512x512-ox.tz2" (
@@ -331,8 +489,24 @@ if not exist "C:\TopazMirror\v1\ggn-v3-fp32-128x128-4x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ggn-v3-fp32-128x128-4x-ox.tz2" "http://models.topazlabs.com/v1/ggn-v3-fp32-128x128-4x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-2x-ov.tz" "http://models.topazlabs.com/v1/ggnv2-v3-fp16-128x128-2x-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-2x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-2x-ox.tz" "http://models.topazlabs.com/v1/ggnv2-v3-fp16-128x128-2x-ox.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-2x-rev2-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-2x-rev2-ov.tz2" "http://models.topazlabs.com/v1/ggnv2-v3-fp16-128x128-2x-rev2-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-4x-ov.tz" "http://models.topazlabs.com/v1/ggnv2-v3-fp16-128x128-4x-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-4x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-4x-ox.tz" "http://models.topazlabs.com/v1/ggnv2-v3-fp16-128x128-4x-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ggnv2-v3-fp16-128x128-4x-rev2-ov.tz2" (
@@ -363,6 +537,10 @@ if not exist "C:\TopazMirror\v1\ggn_ap-v2-fp16-512x512-rev2-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ggn_ap-v2-fp16-512x512-rev2-ox.tz2" "http://models.topazlabs.com/v1/ggn_ap-v2-fp16-512x512-rev2-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ghc-v2-fp32-192x192-1x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghc-v2-fp32-192x192-1x-ov.tz" "http://models.topazlabs.com/v1/ghc-v2-fp32-192x192-1x-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ghc-v2-fp32-192x192-1x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghc-v2-fp32-192x192-1x-ov.tz2" "http://models.topazlabs.com/v1/ghc-v2-fp32-192x192-1x-ov.tz2"
 )
@@ -371,12 +549,20 @@ if not exist "C:\TopazMirror\v1\ghc-v2-fp32-192x192-1x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghc-v2-fp32-192x192-1x-ox.tz2" "http://models.topazlabs.com/v1/ghc-v2-fp32-192x192-1x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ghc-v2-fp32-192x192-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghc-v2-fp32-192x192-2x-ov.tz" "http://models.topazlabs.com/v1/ghc-v2-fp32-192x192-2x-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ghc-v2-fp32-192x192-2x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghc-v2-fp32-192x192-2x-ov.tz2" "http://models.topazlabs.com/v1/ghc-v2-fp32-192x192-2x-ov.tz2"
 )
 
 if not exist "C:\TopazMirror\v1\ghc-v2-fp32-192x192-2x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghc-v2-fp32-192x192-2x-ox.tz2" "http://models.topazlabs.com/v1/ghc-v2-fp32-192x192-2x-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ghc-v2-fp32-192x192-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghc-v2-fp32-192x192-4x-ov.tz" "http://models.topazlabs.com/v1/ghc-v2-fp32-192x192-4x-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ghc-v2-fp32-192x192-4x-ov.tz2" (
@@ -411,8 +597,24 @@ if not exist "C:\TopazMirror\v1\ghq-v1-fp32-96x96-4x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghq-v1-fp32-96x96-4x-ox.tz2" "http://models.topazlabs.com/v1/ghq-v1-fp32-96x96-4x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-2x-ov.tz" "http://models.topazlabs.com/v1/ghqv2-v1-fp16-128x128-2x-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-2x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-2x-ox.tz" "http://models.topazlabs.com/v1/ghqv2-v1-fp16-128x128-2x-ox.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-2x-rev2-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-2x-rev2-ov.tz2" "http://models.topazlabs.com/v1/ghqv2-v1-fp16-128x128-2x-rev2-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-4x-ov.tz" "http://models.topazlabs.com/v1/ghqv2-v1-fp16-128x128-4x-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-4x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-4x-ox.tz" "http://models.topazlabs.com/v1/ghqv2-v1-fp16-128x128-4x-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ghqv2-v1-fp16-128x128-4x-rev2-ov.tz2" (
@@ -427,8 +629,24 @@ if not exist "C:\TopazMirror\v1\ghqv2-v1-fp32-128x128-4x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2-v1-fp32-128x128-4x-ox.tz2" "http://models.topazlabs.com/v1/ghqv2-v1-fp32-128x128-4x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-2x-ov.tz" "http://models.topazlabs.com/v1/ghqv2_ldn-v1-fp16-128x128-2x-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-2x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-2x-ox.tz" "http://models.topazlabs.com/v1/ghqv2_ldn-v1-fp16-128x128-2x-ox.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-2x-rev2-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-2x-rev2-ov.tz2" "http://models.topazlabs.com/v1/ghqv2_ldn-v1-fp16-128x128-2x-rev2-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-4x-ov.tz" "http://models.topazlabs.com/v1/ghqv2_ldn-v1-fp16-128x128-4x-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-4x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-4x-ox.tz" "http://models.topazlabs.com/v1/ghqv2_ldn-v1-fp16-128x128-4x-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ghqv2_ldn-v1-fp16-128x128-4x-rev2-ov.tz2" (
@@ -475,8 +693,16 @@ if not exist "C:\TopazMirror\v1\gmp-v2-fp32-192x192-4x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gmp-v2-fp32-192x192-4x-ox.tz2" "http://models.topazlabs.com/v1/gmp-v2-fp32-192x192-4x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\gmpv2-v13-fp16-192x192-2x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gmpv2-v13-fp16-192x192-2x-ov.tz" "http://models.topazlabs.com/v1/gmpv2-v13-fp16-192x192-2x-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\gmpv2-v13-fp16-192x192-2x-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gmpv2-v13-fp16-192x192-2x-ov.tz2" "http://models.topazlabs.com/v1/gmpv2-v13-fp16-192x192-2x-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\gmpv2-v13-fp16-192x192-4x-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\gmpv2-v13-fp16-192x192-4x-ov.tz" "http://models.topazlabs.com/v1/gmpv2-v13-fp16-192x192-4x-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\gmpv2-v13-fp16-192x192-4x-ov.tz2" (
@@ -499,24 +725,48 @@ if not exist "C:\TopazMirror\v1\iisa-v1-fp32-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\iisa-v1-fp32-ox.tz2" "http://models.topazlabs.com/v1/iisa-v1-fp32-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\iri-v1-fp32-800x800-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\iri-v1-fp32-800x800-ov.tz" "http://models.topazlabs.com/v1/iri-v1-fp32-800x800-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\iri-v1-fp32-800x800-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\iri-v1-fp32-800x800-ov.tz2" "http://models.topazlabs.com/v1/iri-v1-fp32-800x800-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\iri-v1-fp32-800x800-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\iri-v1-fp32-800x800-ox.tz" "http://models.topazlabs.com/v1/iri-v1-fp32-800x800-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\irwn_dec-v2-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\irwn_dec-v2-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/irwn_dec-v2-fp32-64x64-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\irwn_dec-v2-fp32-64x64.onnx.data" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\irwn_dec-v2-fp32-64x64.onnx.data" "http://models.topazlabs.com/v1/irwn_dec-v2-fp32-64x64.onnx.data"
+)
+
 if not exist "C:\TopazMirror\v1\irwn_dit-v2-fp16-128x128-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\irwn_dit-v2-fp16-128x128-ox.tz2" "http://models.topazlabs.com/v1/irwn_dit-v2-fp16-128x128-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\irwn_dit-v2-fp16-128x128.onnx.data" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\irwn_dit-v2-fp16-128x128.onnx.data" "http://models.topazlabs.com/v1/irwn_dit-v2-fp16-128x128.onnx.data"
 )
 
 if not exist "C:\TopazMirror\v1\irwn_dit-v2-fp32-128x128-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\irwn_dit-v2-fp32-128x128-ox.tz2" "http://models.topazlabs.com/v1/irwn_dit-v2-fp32-128x128-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\irwn_dit-v2-fp32-128x128.onnx.data" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\irwn_dit-v2-fp32-128x128.onnx.data" "http://models.topazlabs.com/v1/irwn_dit-v2-fp32-128x128.onnx.data"
+)
+
 if not exist "C:\TopazMirror\v1\irwn_enc-v2-fp32-512x512-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\irwn_enc-v2-fp32-512x512-ox.tz2" "http://models.topazlabs.com/v1/irwn_enc-v2-fp32-512x512-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\irwn_enc-v2-fp32-512x512.onnx.data" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\irwn_enc-v2-fp32-512x512.onnx.data" "http://models.topazlabs.com/v1/irwn_enc-v2-fp32-512x512.onnx.data"
 )
 
 if not exist "C:\TopazMirror\v1\isoa-v1-fp32-512x512-ov.tz2" (
@@ -535,8 +785,16 @@ if not exist "C:\TopazMirror\v1\isob-v1-fp32-512x512-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\isob-v1-fp32-512x512-ox.tz2" "http://models.topazlabs.com/v1/isob-v1-fp32-512x512-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ldclc-v1-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldclc-v1-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/ldclc-v1-fp16-64x64-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ldclc-v1-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldclc-v1-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/ldclc-v1-fp16-64x64-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ldclc-v1-fp16-64x64-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldclc-v1-fp16-64x64-ox.tz" "http://models.topazlabs.com/v1/ldclc-v1-fp16-64x64-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ldclc-v1-fp16-64x64-ox.tz2" (
@@ -551,12 +809,20 @@ if not exist "C:\TopazMirror\v1\ldclc-v1-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldclc-v1-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/ldclc-v1-fp32-64x64-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ldd21-v2-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldd21-v2-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/ldd21-v2-fp16-64x64-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ldd21-v2-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldd21-v2-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/ldd21-v2-fp16-64x64-ov.tz2"
 )
 
 if not exist "C:\TopazMirror\v1\ldd21-v2-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldd21-v2-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/ldd21-v2-fp32-64x64-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\lddv21-v1-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\lddv21-v1-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/lddv21-v1-fp16-64x64-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\lddv21-v1-fp16-64x64-ov.tz2" (
@@ -567,6 +833,10 @@ if not exist "C:\TopazMirror\v1\lddv21-v1-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\lddv21-v1-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/lddv21-v1-fp32-64x64-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\lde21-v1-fp16-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\lde21-v1-fp16-512x512-ov.tz" "http://models.topazlabs.com/v1/lde21-v1-fp16-512x512-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\lde21-v1-fp16-512x512-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\lde21-v1-fp16-512x512-ov.tz2" "http://models.topazlabs.com/v1/lde21-v1-fp16-512x512-ov.tz2"
 )
@@ -575,12 +845,24 @@ if not exist "C:\TopazMirror\v1\lde21-v1-fp32-512x512-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\lde21-v1-fp32-512x512-ox.tz2" "http://models.topazlabs.com/v1/lde21-v1-fp32-512x512-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ldu21-v2-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldu21-v2-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/ldu21-v2-fp16-64x64-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ldu21-v2-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldu21-v2-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/ldu21-v2-fp16-64x64-ov.tz2"
 )
 
 if not exist "C:\TopazMirror\v1\ldu21-v2-fp32-64x64-rev1-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldu21-v2-fp32-64x64-rev1-ox.tz2" "http://models.topazlabs.com/v1/ldu21-v2-fp32-64x64-rev1-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ldu21-v2-fp32-64x64-rev1.pb" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ldu21-v2-fp32-64x64-rev1.pb" "http://models.topazlabs.com/v1/ldu21-v2-fp32-64x64-rev1.pb"
+)
+
+if not exist "C:\TopazMirror\v1\lensblur-v3-fp32-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\lensblur-v3-fp32-512x512-ov.tz" "http://models.topazlabs.com/v1/lensblur-v3-fp32-512x512-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\lensblur-v3-fp32-512x512-ov.tz2" (
@@ -615,6 +897,10 @@ if not exist "C:\TopazMirror\v1\mobileclip2s2_main_subject_classifier.bin" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\mobileclip2s2_main_subject_classifier.bin" "http://models.topazlabs.com/v1/mobileclip2s2_main_subject_classifier.bin"
 )
 
+if not exist "C:\TopazMirror\v1\neg_emb.yaml" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\neg_emb.yaml" "http://models.topazlabs.com/v1/neg_emb.yaml"
+)
+
 if not exist "C:\TopazMirror\v1\noise_det-v1-fp16-128x128-1x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\noise_det-v1-fp16-128x128-1x-ox.tz2" "http://models.topazlabs.com/v1/noise_det-v1-fp16-128x128-1x-ox.tz2"
 )
@@ -639,24 +925,56 @@ if not exist "C:\TopazMirror\v1\rxl_encoder1-v1-fp32-960x960-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\rxl_encoder1-v1-fp32-960x960-ox.tz2" "http://models.topazlabs.com/v1/rxl_encoder1-v1-fp32-960x960-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\rxl_merges.txt" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\rxl_merges.txt" "http://models.topazlabs.com/v1/rxl_merges.txt"
+)
+
 if not exist "C:\TopazMirror\v1\rxl_unet0-v2-fp16-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\rxl_unet0-v2-fp16-ox.tz2" "http://models.topazlabs.com/v1/rxl_unet0-v2-fp16-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\rxl_unet0-v2-fp16.pb" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\rxl_unet0-v2-fp16.pb" "http://models.topazlabs.com/v1/rxl_unet0-v2-fp16.pb"
 )
 
 if not exist "C:\TopazMirror\v1\rxl_unet1-v2-fp16-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\rxl_unet1-v2-fp16-ox.tz2" "http://models.topazlabs.com/v1/rxl_unet1-v2-fp16-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\rxl_unet1-v2-fp16.pb" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\rxl_unet1-v2-fp16.pb" "http://models.topazlabs.com/v1/rxl_unet1-v2-fp16.pb"
+)
+
+if not exist "C:\TopazMirror\v1\rxl_vocab.txt" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\rxl_vocab.txt" "http://models.topazlabs.com/v1/rxl_vocab.txt"
+)
+
+if not exist "C:\TopazMirror\v1\samdec-v1-fp16-1024x1024-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\samdec-v1-fp16-1024x1024-ov.tz" "http://models.topazlabs.com/v1/samdec-v1-fp16-1024x1024-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\samdec-v1-fp16-1024x1024-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\samdec-v1-fp16-1024x1024-ov.tz2" "http://models.topazlabs.com/v1/samdec-v1-fp16-1024x1024-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\samdec-v1-fp32-1024x1024-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\samdec-v1-fp32-1024x1024-ox.tz" "http://models.topazlabs.com/v1/samdec-v1-fp32-1024x1024-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\samdec-v1-fp32-1024x1024-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\samdec-v1-fp32-1024x1024-ox.tz2" "http://models.topazlabs.com/v1/samdec-v1-fp32-1024x1024-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\samenc-v1-fp16-1024x1024-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\samenc-v1-fp16-1024x1024-ov.tz" "http://models.topazlabs.com/v1/samenc-v1-fp16-1024x1024-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\samenc-v1-fp16-1024x1024-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\samenc-v1-fp16-1024x1024-ov.tz2" "http://models.topazlabs.com/v1/samenc-v1-fp16-1024x1024-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\samenc-v1-fp32-1024x1024-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\samenc-v1-fp32-1024x1024-ox.tz" "http://models.topazlabs.com/v1/samenc-v1-fp32-1024x1024-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\samenc-v1-fp32-1024x1024-ox.tz2" (
@@ -667,12 +985,36 @@ if not exist "C:\TopazMirror\v1\sddustdec-v1-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustdec-v1-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/sddustdec-v1-fp16-64x64-ov.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\sddustdec-v2-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustdec-v2-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/sddustdec-v2-fp16-64x64-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\sddustdec-v2-fp16-64x64-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustdec-v2-fp16-64x64-ox.tz" "http://models.topazlabs.com/v1/sddustdec-v2-fp16-64x64-ox.tz"
+)
+
 if not exist "C:\TopazMirror\v1\sddustenc-v1-fp16-512x512-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustenc-v1-fp16-512x512-ov.tz2" "http://models.topazlabs.com/v1/sddustenc-v1-fp16-512x512-ov.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\sddustenc-v2-fp16-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustenc-v2-fp16-512x512-ov.tz" "http://models.topazlabs.com/v1/sddustenc-v2-fp16-512x512-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\sddustenc-v2-fp16-512x512-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustenc-v2-fp16-512x512-ox.tz" "http://models.topazlabs.com/v1/sddustenc-v2-fp16-512x512-ox.tz"
+)
+
 if not exist "C:\TopazMirror\v1\sddustunet-v1-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustunet-v1-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/sddustunet-v1-fp16-64x64-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\sddustunet-v2-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustunet-v2-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/sddustunet-v2-fp16-64x64-ov.tz"
+)
+
+if not exist "C:\TopazMirror\v1\sddustunet-v2-fp16-64x64-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sddustunet-v2-fp16-64x64-ox.tz" "http://models.topazlabs.com/v1/sddustunet-v2-fp16-64x64-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\sdi_dec-v2-fp16-512x512-ov.tz2" (
@@ -719,12 +1061,28 @@ if not exist "C:\TopazMirror\v1\sdi_unet-v5-fp16-512x512-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sdi_unet-v5-fp16-512x512-ox.tz2" "http://models.topazlabs.com/v1/sdi_unet-v5-fp16-512x512-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\slb-v1-fp32-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\slb-v1-fp32-512x512-ov.tz" "http://models.topazlabs.com/v1/slb-v1-fp32-512x512-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\slb-v1-fp32-512x512-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\slb-v1-fp32-512x512-ov.tz2" "http://models.topazlabs.com/v1/slb-v1-fp32-512x512-ov.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\slb-v1-fp32-512x512-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\slb-v1-fp32-512x512-ox.tz" "http://models.topazlabs.com/v1/slb-v1-fp32-512x512-ox.tz"
+)
+
+if not exist "C:\TopazMirror\v1\sll-v1-fp32-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sll-v1-fp32-512x512-ov.tz" "http://models.topazlabs.com/v1/sll-v1-fp32-512x512-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\sll-v1-fp32-512x512-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sll-v1-fp32-512x512-ov.tz2" "http://models.topazlabs.com/v1/sll-v1-fp32-512x512-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\sll-v1-fp32-512x512-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sll-v1-fp32-512x512-ox.tz" "http://models.topazlabs.com/v1/sll-v1-fp32-512x512-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\sll-v1-fp32-512x512-ox.tz2" (
@@ -771,12 +1129,20 @@ if not exist "C:\TopazMirror\v1\sms_new-v3-fp16-320x320-rev2-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\sms_new-v3-fp16-320x320-rev2-ox.tz2" "http://models.topazlabs.com/v1/sms_new-v3-fp16-320x320-rev2-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\spfcdec-v1-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\spfcdec-v1-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/spfcdec-v1-fp16-64x64-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\spfcdec-v1-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\spfcdec-v1-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/spfcdec-v1-fp16-64x64-ov.tz2"
 )
 
 if not exist "C:\TopazMirror\v1\spfcdec-v1-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\spfcdec-v1-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/spfcdec-v1-fp32-64x64-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\spfcdit-v1-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\spfcdit-v1-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/spfcdit-v1-fp16-64x64-ov.tz"
 )
 
 if not exist "C:\TopazMirror\v1\spfcdit-v1-fp16-64x64-ov.tz2" (
@@ -787,6 +1153,10 @@ if not exist "C:\TopazMirror\v1\spfcdit-v1-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\spfcdit-v1-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/spfcdit-v1-fp32-64x64-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\spfcenc-v1-fp16-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\spfcenc-v1-fp16-512x512-ov.tz" "http://models.topazlabs.com/v1/spfcenc-v1-fp16-512x512-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\spfcenc-v1-fp16-512x512-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\spfcenc-v1-fp16-512x512-ov.tz2" "http://models.topazlabs.com/v1/spfcenc-v1-fp16-512x512-ov.tz2"
 )
@@ -795,32 +1165,64 @@ if not exist "C:\TopazMirror\v1\spfcenc-v1-fp32-512x512-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\spfcenc-v1-fp32-512x512-ox.tz2" "http://models.topazlabs.com/v1/spfcenc-v1-fp32-512x512-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ssddec0_0-v1-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec0_0-v1-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/ssddec0_0-v1-fp16-64x64-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ssddec0_0-v1-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec0_0-v1-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/ssddec0_0-v1-fp16-64x64-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ssddec0_0-v1-fp16-64x64-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec0_0-v1-fp16-64x64-ox.tz" "http://models.topazlabs.com/v1/ssddec0_0-v1-fp16-64x64-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ssddec0_0-v1-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec0_0-v1-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/ssddec0_0-v1-fp32-64x64-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ssddec0_5-v1-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec0_5-v1-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/ssddec0_5-v1-fp16-64x64-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ssddec0_5-v1-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec0_5-v1-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/ssddec0_5-v1-fp16-64x64-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ssddec0_5-v1-fp16-64x64-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec0_5-v1-fp16-64x64-ox.tz" "http://models.topazlabs.com/v1/ssddec0_5-v1-fp16-64x64-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ssddec0_5-v1-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec0_5-v1-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/ssddec0_5-v1-fp32-64x64-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ssddec1_0-v1-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec1_0-v1-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/ssddec1_0-v1-fp16-64x64-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ssddec1_0-v1-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec1_0-v1-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/ssddec1_0-v1-fp16-64x64-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ssddec1_0-v1-fp16-64x64-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec1_0-v1-fp16-64x64-ox.tz" "http://models.topazlabs.com/v1/ssddec1_0-v1-fp16-64x64-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ssddec1_0-v1-fp32-64x64-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssddec1_0-v1-fp32-64x64-ox.tz2" "http://models.topazlabs.com/v1/ssddec1_0-v1-fp32-64x64-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ssdenc-sharpen-v1-fp16-512x512-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdenc-sharpen-v1-fp16-512x512-ov.tz" "http://models.topazlabs.com/v1/ssdenc-sharpen-v1-fp16-512x512-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ssdenc-sharpen-v1-fp16-512x512-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdenc-sharpen-v1-fp16-512x512-ov.tz2" "http://models.topazlabs.com/v1/ssdenc-sharpen-v1-fp16-512x512-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ssdenc-sharpen-v1-fp16-512x512-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdenc-sharpen-v1-fp16-512x512-ox.tz" "http://models.topazlabs.com/v1/ssdenc-sharpen-v1-fp16-512x512-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ssdenc-v1-fp16-512x512-ov.tz2" (
@@ -831,8 +1233,16 @@ if not exist "C:\TopazMirror\v1\ssdenc-v1-fp16-512x512-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdenc-v1-fp16-512x512-ox.tz2" "http://models.topazlabs.com/v1/ssdenc-v1-fp16-512x512-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\ssdunet-sharpen-v1-fp16-64x64-ov.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdunet-sharpen-v1-fp16-64x64-ov.tz" "http://models.topazlabs.com/v1/ssdunet-sharpen-v1-fp16-64x64-ov.tz"
+)
+
 if not exist "C:\TopazMirror\v1\ssdunet-sharpen-v1-fp16-64x64-ov.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdunet-sharpen-v1-fp16-64x64-ov.tz2" "http://models.topazlabs.com/v1/ssdunet-sharpen-v1-fp16-64x64-ov.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ssdunet-sharpen-v1-fp16-64x64-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdunet-sharpen-v1-fp16-64x64-ox.tz" "http://models.topazlabs.com/v1/ssdunet-sharpen-v1-fp16-64x64-ox.tz"
 )
 
 if not exist "C:\TopazMirror\v1\ssdunet-v1-fp16-64x64-ov.tz2" (
@@ -841,6 +1251,10 @@ if not exist "C:\TopazMirror\v1\ssdunet-v1-fp16-64x64-ov.tz2" (
 
 if not exist "C:\TopazMirror\v1\ssdunet-v1-fp32-64x64-rev1-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdunet-v1-fp32-64x64-rev1-ox.tz2" "http://models.topazlabs.com/v1/ssdunet-v1-fp32-64x64-rev1-ox.tz2"
+)
+
+if not exist "C:\TopazMirror\v1\ssdunet-v1-fp32-64x64-rev1.onnx.data" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\ssdunet-v1-fp32-64x64-rev1.onnx.data" "http://models.topazlabs.com/v1/ssdunet-v1-fp32-64x64-rev1.onnx.data"
 )
 
 if not exist "C:\TopazMirror\v1\sstd-v2-fp32-512x512-ov.tz2" (
@@ -935,6 +1349,10 @@ if not exist "C:\TopazMirror\v1\trfn-v1-fp32-512x512-1x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\trfn-v1-fp32-512x512-1x-ox.tz2" "http://models.topazlabs.com/v1/trfn-v1-fp32-512x512-1x-ox.tz2"
 )
 
+if not exist "C:\TopazMirror\v1\txtdtx-v1-fp16-640x960-1x-ox.tz" (
+    curl -L --fail --retry 3 -o "C:\TopazMirror\v1\txtdtx-v1-fp16-640x960-1x-ox.tz" "http://models.topazlabs.com/v1/txtdtx-v1-fp16-640x960-1x-ox.tz"
+)
+
 if not exist "C:\TopazMirror\v1\txtdtx-v1-fp16-640x960-1x-ox.tz2" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\txtdtx-v1-fp16-640x960-1x-ox.tz2" "http://models.topazlabs.com/v1/txtdtx-v1-fp16-640x960-1x-ox.tz2"
 )
@@ -959,5 +1377,20 @@ if not exist "C:\TopazMirror\v1\WhiteBalanceData-v2.bin" (
     curl -L --fail --retry 3 -o "C:\TopazMirror\v1\WhiteBalanceData-v2.bin" "http://models.topazlabs.com/v1/WhiteBalanceData-v2.bin"
 )
 
+echo Started : %STARTTIME%
+echo Finished: %TIME%
+echo.
+echo ===========================================
+echo   Topaz Model 1.0.1 Downloader Complete
+echo       Folder: %CD%
+echo          Thank Github 91ajames
+echo.
+echo       Topaz-Offline-Mirror-Server
+echo.
+echo               Preservation
+echo ===========================================
+timeout /t 3 /nobreak >nul
+
+echo.
 echo Done.
 pause
