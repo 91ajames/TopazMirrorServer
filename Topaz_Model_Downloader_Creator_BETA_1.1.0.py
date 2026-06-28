@@ -1,6 +1,8 @@
+import subprocess
+
 from pathlib import Path
 
-VERSION = "BETA 1.0.3"
+VERSION = "BETA 1.1.0"
 VERSION_FILE = VERSION.replace(" ", "_")
 
 SOURCE_FOLDER = Path(r"C:\TopazMirror\v1")
@@ -123,5 +125,18 @@ with OUT_BAT.open("w", encoding="utf-8", newline="\r\n") as f:
 
 print(f"Created: {OUT_BAT}")
 print(f"Files added: {total}")
+
+try:
+    run_now = input("\nRun the generated BAT now? (Y/N): ").strip().lower()
+
+    if run_now in ("y", "yes"):
+        print("\nLaunching BAT...")
+        subprocess.run(f'cmd /k "{OUT_BAT}"', shell=True)
+    else:
+        print("\nBAT was not launched.")
+
+except Exception as e:
+    print("\nERROR while trying to launch BAT:")
+    print(e)
 
 input("\nPress Enter to exit...")
