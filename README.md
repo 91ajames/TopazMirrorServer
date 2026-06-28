@@ -26,7 +26,7 @@ This project recreates the expected download structure locally, allowing the sof
 
 ## Repository Statistics
 
-* **AI model files:** 326
+* **AI model files:** 325
 * **Approximate size:** 78.9 GB
 
 ---
