@@ -1,5 +1,4 @@
 # Topaz Offline Download Server
-# Topaz Offline Download Server
 
 A local mirror for **Topaz Photo AI**, **Topaz Gigapixel AI**, and related AI model files.
 
