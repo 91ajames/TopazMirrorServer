@@ -5,27 +5,365 @@ from pathlib import Path
 VERSION = "v 2.0.0"
 VERSION_FILE = VERSION.replace(" ", "_")
 
-SOURCE_FOLDER = Path(r"C:\TopazMirror\v1")
 DEST = r"C:\TopazMirror\v1"
 MIRROR_ROOT = r"C:\TopazMirror"
 BASE_URL = "http://models.topazlabs.com/v1"
 OUT_BAT = Path(fr"C:\TopazMirror\Topaz_Model_Downloader_{VERSION_FILE}.bat")
 
-EXTENSIONS = (".bin", ".data", ".pb", ".txt", ".tz", ".tz2", ".yaml")
+MIRROR_ROOT = Path(r"C:\TopazMirror")
+DEST = MIRROR_ROOT / "v1"
+TEST = MIRROR_ROOT / "_test"
+TEST11 = MIRROR_ROOT / "1.1"
+TRACK = DEST / "track"
 
-if not SOURCE_FOLDER.exists():
-    raise FileNotFoundError(f"Source folder does not exist: {SOURCE_FOLDER}")
+# Create required folders if they don't already exist
+for folder in (MIRROR_ROOT, DEST, TEST, TEST11, TRACK):
+    folder.mkdir(parents=True, exist_ok=True)
 
-files = sorted(
-    [
-        p for p in SOURCE_FOLDER.iterdir()
-        if p.is_file() and p.name.lower().endswith(EXTENSIONS)
-    ],
-    key=lambda x: x.name.lower()
-)
+FILES_RAW = r"""
+‎irwn_dit-v2-fp32-128x128.onnx.data                                     
+‎ldu21-v2-fp32-64x64-rev1.pb                                            
+‎ssdunet-v1-fp32-64x64-rev1.onnx.data                                   
+‎dswn_dit-v1-fp16-128x128-rev1.onnx.data                                
+‎irwn_dit-v2-fp16-128x128.onnx.data                                     
+‎rxl_unet1-v2-fp16.pb                                                   
+‎rxl_unet0-v2-fp16.pb                                                   
+‎ldu21-v2-fp16-64x64-ov.tz2                                             
+‎ldu21-v2-fp16-64x64-ov.tz                                              
+‎spfcdit-v1-fp32-64x64-ox.tz2                                           
+‎stdmax-v1-fp16-192x192-ox.tz2                                          
+‎ssdunet-sharpen-v1-fp16-64x64-ov.tz2                                   
+‎sddustunet-v1-fp16-64x64-ov.tz2                                        
+‎ssdunet-v1-fp16-64x64-ov.tz2                                           
+‎sdi_unet-v4-fp16-512x512-ov.tz2                                        
+‎sdi_unet-v5-fp16-512x512-ox.tz2                                        
+‎tpn_unet-v1-fp16-64x64-ox.tz2                                          
+‎sdi_unet-v4-fp16-512x512-ort.tz2                                       
+‎stdmax-v1-fp16-192x192-ov.tz2                                          
+‎sddustunet-v2-fp16-64x64-ox.tz                                         
+‎sddustunet-v2-fp16-64x64-ov.tz                                         
+‎ssdunet-sharpen-v1-fp16-64x64-ox.tz                                    
+‎ssdunet-sharpen-v1-fp16-64x64-ov.tz                                    
+‎spfcdit-v1-fp16-64x64-ov.tz2                                           
+‎spfcdit-v1-fp16-64x64-ov.tz                                            
+‎gfrfn-v3-fp32-1024x1024-ox.tz2                                         
+‎sstd_ahres-v1-fp32-512x512-ox.tz2                                      
+‎sstd_phres-v1-fp32-512x512-ox.tz2                                      
+‎gfrg-v3-fp32-512x512-ox.tz2                                            
+‎samenc-v1-fp32-1024x1024-ox.tz2                                        
+‎gfrf-v2-fp32-1024x1024-ox.tz2                                          
+‎daclip-v1-fp32-224x224-1x-ov.tz                                        
+‎gfrg-v3-fp32-512x512-ox.tz                                             
+‎gfg-v1-fp32-512x512-ox.tz2                                             
+‎samenc-v1-fp32-1024x1024-ox.tz                                         
+‎gfrf-v2-fp32-1024x1024-ox.tz                                           
+‎gfrf-v2-fp16-1024x1024-ov.tz2                                          
+‎irwn_dec-v2-fp32-64x64.onnx.data                                       
+‎dswn_dec-v1-fp32-128x128.onnx.data                                     
+‎ldd21-v2-fp32-64x64-ox.tz2                                             
+‎lddv21-v1-fp32-64x64-ox.tz2                                            
+‎rxl_embed-v1-fp16-77x768-ox.tz2                                        
+‎gmpv2-v13-fp32-192x192-4x-ox.tz2                                       
+‎drw_native-v1-fp32-512x512-ox.tz2                                      
+‎drw_standard-v1-fp32-512x512-ox.tz2                                    
+‎ggnv2-v3-fp32-128x128-4x-ox.tz2                                        
+‎ghqv2_ldn-v1-fp32-128x128-4x-ox.tz2                                    
+‎ghqv2-v1-fp32-128x128-4x-ox.tz2                                        
+‎dnt_beta-v5-fp32-512x512-ov.tz2                                        
+‎isob-v1-fp32-512x512-ov.tz2                                            
+‎lensblur-v3-fp32-512x512-ov.tz2                                        
+‎sstg-v1-fp32-512x512-ov.tz2                                            
+‎gmpv2-v13-fp32-192x192-2x-ox.tz2                                       
+‎sstd-v2-fp32-512x512-ov.tz2                                            
+‎ggn-v3-fp32-128x128-4x-ox.tz2                                          
+‎lensblur-v3-fp32-512x512-ox.tz2                                        
+‎dnt_beta-v5-fp32-512x512-ox.tz2                                        
+‎isob-v1-fp32-512x512-ox.tz2                                            
+‎sstd-v2-fp32-512x512-ox.tz2                                            
+‎sstg-v1-fp32-512x512-ox.tz2                                            
+‎ghq-v1-fp32-96x96-4x-ox.tz2                                            
+‎ggnv2-v3-fp32-128x128-2x-ox.tz2                                        
+‎ghqv2_ldn-v1-fp32-128x128-2x-ox.tz2                                    
+‎ghqv2-v1-fp32-128x128-2x-ox.tz2                                        
+‎ggn-v3-fp32-128x128-2x-ox.tz2                                          
+‎ghq-v1-fp32-96x96-2x-ox.tz2                                            
+‎dswn_enc-v1-fp32-1024x1024.onnx.data                                   
+‎irwn_enc-v2-fp32-512x512.onnx.data                                     
+‎gfrf-v2-fp16-1024x1024-ov.tz                                           
+‎iri-v1-fp32-800x800-ov.tz2                                             
+‎lensblur-v3-fp32-512x512-ov.tz                                         
+‎rxl_decoder0-v1-fp32-96x96-ox.tz2                                      
+‎rxl_decoder1-v1-fp32-120x120-ox.tz2                                    
+‎ssddec0_0-v1-fp32-64x64-ox.tz2                                         
+‎ssddec0_5-v1-fp32-64x64-ox.tz2                                         
+‎ssddec1_0-v1-fp32-64x64-ox.tz2                                         
+‎spfcdec-v1-fp32-64x64-ox.tz2                                           
+‎ghqv3-v2-fp16-512x512-rev1-ort.tz2                                     
+‎iri-v1-fp32-800x800-ox.tz                                              
+‎iri-v1-fp32-800x800-ov.tz                                              
+‎gfrg-v3-fp16-512x512-ov.tz2                                            
+‎samenc-v1-fp16-1024x1024-ov.tz2                                        
+‎sms_new-v3-fp16-320x320-ox.tz2                                         
+‎s_mask_l_flexible-v2-fp16-320x320-rev2-ox.tz2                          
+‎smp_flexible-v2-fp16-320x320-ox.tz2                                    
+‎gfrg-v3-fp16-512x512-ov.tz                                             
+‎gfg-v1-fp16-512x512-ov.tz2                                             
+‎samenc-v1-fp16-1024x1024-ov.tz                                         
+‎ghqv3-v2-fp16-512x512-rev1-ox.tz2                                      
+‎ghqv3-v2-fp16-512x512-ox.tz2                                           
+‎slsp-v3-fp32-512x512-ov.tz2                                            
+‎slb-v1-fp32-512x512-ov.tz2                                             
+‎sll-v1-fp32-512x512-ov.tz2                                             
+‎slsp-v3-fp32-512x512-ox.tz2                                            
+‎sll-v1-fp32-512x512-ox.tz2                                             
+‎daclip-v3-fp32-256x256-ox.tz2                                          
+‎sll-v1-fp32-512x512-ov.tz                                              
+‎sll-v1-fp32-512x512-ox.tz                                              
+‎slb-v1-fp32-512x512-ov.tz                                              
+‎slb-v1-fp32-512x512-ox.tz                                              
+‎lde21-v1-fp32-512x512-ox.tz2                                           
+‎rxl_encoder0-v1-fp32-768x768-ox.tz2                                    
+‎rxl_encoder1-v1-fp32-960x960-ox.tz2                                    
+‎spfcenc-v1-fp32-512x512-ox.tz2                                         
+‎ghc-v2-fp32-192x192-4x-ov.tz2                                          
+‎gde-v1-fp32-192x192-4x-ov.tz2                                          
+‎ggi-v1-fp32-192x192-4x-ov.tz2                                          
+‎gmp-v1-fp32-192x192-4x-ov.tz2                                          
+‎ghc-v2-fp32-192x192-4x-ox.tz2                                          
+‎gde-v2-fp32-192x192-4x-ox.tz2                                          
+‎ggi-v2-fp32-192x192-4x-ox.tz2                                          
+‎gmp-v2-fp32-192x192-4x-ox.tz2                                          
+‎ghc-v2-fp32-192x192-2x-ov.tz2                                          
+‎gde-v1-fp32-192x192-2x-ov.tz2                                          
+‎ggi-v1-fp32-192x192-2x-ov.tz2                                          
+‎gmp-v1-fp32-192x192-2x-ov.tz2                                          
+‎ghc-v2-fp32-192x192-2x-ox.tz2                                          
+‎gde-v2-fp32-192x192-2x-ox.tz2                                          
+‎ggi-v2-fp32-192x192-2x-ox.tz2                                          
+‎gmp-v2-fp32-192x192-2x-ox.tz2                                          
+‎ghc-v2-fp32-192x192-1x-ov.tz2                                          
+‎gde-v1-fp32-192x192-1x-ov.tz2                                          
+‎ghc-v2-fp32-192x192-1x-ox.tz2                                          
+‎gde-v2-fp32-192x192-1x-ox.tz2                                          
+‎ghc-v2-fp32-192x192-4x-ov.tz                                           
+‎gde-v1-fp32-192x192-4x-ov.tz                                           
+‎ghc-v2-fp32-192x192-2x-ov.tz                                           
+‎gde-v1-fp32-192x192-2x-ov.tz                                           
+‎ghc-v2-fp32-192x192-1x-ov.tz                                           
+‎gde-v1-fp32-192x192-1x-ov.tz                                           
+‎gmpv2-v13-fp16-192x192-4x-ov.tz2                                       
+‎gfp-l-v1-fp32-2048x2048-ox.tz2                                         
+‎gfp-l-v1-fp32-2048x2048-ov.tz2                                         
+‎drw_native-v1-fp16-512x512-ov.tz2                                      
+‎drw_standard-v1-fp16-512x512-ov.tz2                                    
+‎ggnv2-v3-fp16-128x128-4x-rev2-ov.tz2                                   
+‎ghqv2_ldn-v1-fp16-128x128-4x-rev2-ov.tz2                               
+‎ghqv2-v1-fp16-128x128-4x-rev2-ov.tz2                                   
+‎gfp-s-v1-fp32-1024x1024-ox.tz2                                         
+‎gfp-s-v1-fp32-1024x1024-ov.tz2                                         
+‎gmpv2-v13-fp16-192x192-2x-ov.tz2                                       
+‎ggn-v3-fp16-128x128-4x-ov.tz2                                          
+‎ggn-v3-fix-fp16-128x128-2x-ox.tz2                                      
+‎ggn-v3-fp16-128x128-4x-ox.tz2                                          
+‎ghq-v1-fp16-96x96-4x-ov.tz2                                            
+‎ggn-v3-fp16-128x128-2x-ov.tz2                                          
+‎ggnv2-v3-fp16-128x128-2x-rev2-ov.tz2                                   
+‎ghqv2_ldn-v1-fp16-128x128-2x-rev2-ov.tz2                               
+‎ghqv2-v1-fp16-128x128-2x-rev2-ov.tz2                                   
+‎ghq-v1-fix-fp16-96x96-2x-ox.tz2                                        
+‎ghq-v1-fp16-96x96-4x-ox.tz2                                            
+‎ghq-v1-fp16-96x96-2x-ov.tz2                                            
+‎gmpv2-v13-fp16-192x192-4x-ov.tz                                        
+‎ghqv2-v1-fp16-128x128-4x-ov.tz                                         
+‎ghqv2-v1-fp16-128x128-4x-ox.tz                                         
+‎ghqv2_ldn-v1-fp16-128x128-4x-ov.tz                                     
+‎ghqv2_ldn-v1-fp16-128x128-4x-ox.tz                                     
+‎ggnv2-v3-fp16-128x128-4x-ov.tz                                         
+‎ggnv2-v3-fp16-128x128-4x-ox.tz                                         
+‎gmpv2-v13-fp16-192x192-2x-ov.tz                                        
+‎ghqv2-v1-fp16-128x128-2x-ov.tz                                         
+‎ghqv2-v1-fp16-128x128-2x-ox.tz                                         
+‎ghqv2_ldn-v1-fp16-128x128-2x-ov.tz                                     
+‎ghqv2_ldn-v1-fp16-128x128-2x-ox.tz                                     
+‎ggnv2-v3-fp16-128x128-2x-ov.tz                                         
+‎ggnv2-v3-fp16-128x128-2x-ox.tz                                         
+‎ldd21-v2-fp16-64x64-ov.tz2                                             
+‎lddv21-v1-fp16-64x64-ov.tz2                                            
+‎sdi_dec-v2-fp16-512x512-ov.tz2                                         
+‎spfcdec-v1-fp16-64x64-ov.tz2                                           
+‎sddustdec-v1-fp16-64x64-ov.tz2                                         
+‎ssddec0_0-v1-fp16-64x64-ov.tz2                                         
+‎ssddec0_5-v1-fp16-64x64-ov.tz2                                         
+‎ssddec1_0-v1-fp16-64x64-ov.tz2                                         
+‎sdi_dec-v4-fp16-512x512-ox.tz2                                         
+‎tpn_dec-v1-fp16-64x64-ox.tz2                                           
+‎sdi_dec-v2-fp16-512x512-ox.tz2                                         
+‎spfcdec-v1-fp16-64x64-ov.tz                                            
+‎ldd21-v2-fp16-64x64-ov.tz                                              
+‎lddv21-v1-fp16-64x64-ov.tz                                             
+‎sddustdec-v2-fp16-64x64-ov.tz                                          
+‎ssddec0_0-v1-fp16-64x64-ov.tz                                          
+‎ssddec1_0-v1-fp16-64x64-ov.tz                                          
+‎ssddec0_5-v1-fp16-64x64-ov.tz                                          
+‎ssddec1_0-v1-fp16-64x64-ox.tz                                          
+‎sddustdec-v2-fp16-64x64-ox.tz                                          
+‎ssddec0_0-v1-fp16-64x64-ox.tz                                          
+‎ssddec0_5-v1-fp16-64x64-ox.tz                                          
+‎iisa-v1-fp32-ox.tz2                                                    
+‎iisa-v1-fp16-1024x1024-rev1-ox.tz2                                     
+‎sms_new-v3-fp16-320x320-ov.tz2                                         
+‎s_mask_l_flexible-v2-fp16-320x320-ov.tz2                               
+‎smp_flexible-v2-fp16-320x320-ov.tz2                                    
+‎sms_new-v3-fp16-320x320-rev2-ox.tz2                                    
+‎daclip-v3-fp16-256x256-rev1-ox.tz2                                     
+‎trfn-v1-fp32-512x512-1x-ox.tz2                                         
+‎trf-v1-fp32-128x128-2x-ox.tz2                                          
+‎lde21-v1-fp16-512x512-ov.tz2                                           
+‎sdi_enc-v2-fp16-512x512-ov.tz2                                         
+‎spfcenc-v1-fp16-512x512-ov.tz2                                         
+‎ssdenc-sharpen-v1-fp16-512x512-ov.tz2                                  
+‎ssdenc-v1-fp16-512x512-ov.tz2                                          
+‎sddustenc-v1-fp16-512x512-ov.tz2                                       
+‎sdi_enc-v4-fp16-512x512-ox.tz2                                         
+‎tpn_enc-v1-fp16-512x512-ox.tz2                                         
+‎ssdenc-v1-fp16-512x512-ox.tz2                                          
+‎sdi_enc-v2-fp16-512x512-ox.tz2                                         
+‎sddustenc-v2-fp16-512x512-ox.tz                                        
+‎ssdenc-sharpen-v1-fp16-512x512-ox.tz                                   
+‎lde21-v1-fp16-512x512-ov.tz                                            
+‎sddustenc-v2-fp16-512x512-ov.tz                                        
+‎spfcenc-v1-fp16-512x512-ov.tz                                          
+‎ssdenc-sharpen-v1-fp16-512x512-ov.tz                                   
+‎txtdtx-v1-fp16-640x960-1x-rev2-ox.tz2                                  
+‎txtdtx-v1-fp16-640x960-1x-ox.tz2                                       
+‎draw_linear-v1-fp32-512x512-ov.tz2                                     
+‎isoa-v1-fp32-512x512-ov.tz2                                            
+‎draw_linear-v1-fp32-512x512-ox.tz2                                     
+‎isoa-v1-fp32-512x512-ox.tz2                                            
+‎txtdtx-v1-fp16-640x960-1x-ox.tz                                        
+‎WhiteBalanceData-v2.bin                                                
+‎gffm-v1-fp32-512x512-ox.tz2                                            
+‎gffm-v1-fp32-512x512-ov.tz2                                            
+‎wbc-v1-fp32-128x128-ox.tz2                                             
+‎trfn-v1-fp16-512x512-1x-ox.tz2                                         
+‎trf-v1-fp16-128x128-4x-ox.tz2                                          
+‎trf-v1-fp32-128x128-4x-ox.tz2                                          
+‎trf-v1-fp16-128x128-2x-ox.tz2                                          
+‎trfn-v1-fp16-512x512-1x-ov.tz2                                         
+‎trf-v1-fp16-128x128-4x-ov.tz2                                          
+‎trf-v1-fp16-128x128-2x-ov.tz2                                          
+‎ghqv3_cache-v2-fp16-224x224-ox.tz2                                     
+‎gendet-v1-fp32-256x256-1x-ox.tz                                        
+‎wbc-v1-fp16-128x128-ox.tz2                                             
+‎wbc-v1-fp16-128x128-ov.tz2                                             
+‎samdec-v1-fp32-1024x1024-ox.tz2                                        
+‎samdec-v1-fp32-1024x1024-ox.tz                                         
+‎gendet-v1-fp32-256x256-1x-ov.tz                                        
+‎samdec-v1-fp16-1024x1024-ov.tz2                                        
+‎samdec-v1-fp16-1024x1024-ov.tz                                         
+‎dswn_dit-v1-fp16-128x128-rev1-ox.tz2                                   
+‎irwn_dit-v2-fp16-128x128-ox.tz2                                        
+‎irwn_dit-v2-fp32-128x128-ox.tz2                                        
+‎apnb-v2-fp32-512x512-ov.tz2                                            
+‎apnb-v2-fp32-512x512-ox.tz2                                            
+‎noise_det-v1-fp16-128x128-1x-ox.tz2                                    
+‎claa-v1-fp32-512x512-ov.tz2                                            
+‎claae-v1-fp32-512x512-ov.tz2                                           
+‎apnb-v2-fp16-512x512-rev2-ox.tz2                                       
+‎slsp_ap-v3-fp32-512x512-ov.tz2                                         
+‎slsp_ap-v2-fp32-512x512-ox.tz2                                         
+‎ggn_ap-v2-fp16-128x128-ox.tz2                                          
+‎claae-v1-fp32-512x512-ox.tz2                                           
+‎claa-v1-fp32-512x512-ox.tz2                                            
+‎sdi_imdn-v1-fp32-96x96-2x-ov.tz2                                       
+‎expoi-v1-fp32-256x256-1x-ox.tz2                                        
+‎mobileclip2s2_main_subject_classifier.bin                              
+‎mobileclip2s2_age_of_photo_classifier.bin                              
+‎expoi-v1-fp32-256x256-1x-ov.tz2                                        
+‎slsp_ap-v2-fp16-512x512-rev2-ox.tz2                                    
+‎neg_emb.yaml                                                           
+‎ggn_ap-v2-fp16-512x512-rev2-ox.tz2                                     
+‎ggn_ap-v2-fp16-128x128-rev2-ox.tz2                                     
+‎ggn_ap-v2-fp16-128x128-ov.tz2                                          
+‎gfpf-v1-fp32-48x48-ox.tz2                                              
+‎rxl_unet0-v2-fp16-ox.tz2                                               
+‎rxl_unet1-v2-fp16-ox.tz2                                               
+‎liting_det-v1-fp16-128x128-rev2-ox.tz2                                 
+‎liting_det-v1-fp16-128x128-ox.tz2                                      
+‎ldu21-v2-fp32-64x64-rev1-ox.tz2                                        
+‎gde_ap-v1-fp32-64x64-ov.tz                                             
+‎claa-v1-fp32-512x512-ov.tz                                             
+‎ssdunet-v1-fp32-64x64-rev1-ox.tz2                                      
+‎claa-v1-fp32-512x512-ox.tz                                             
+‎dswn_dec-v1-fp32-128x128-ox.tz2                                        
+‎irwn_dec-v2-fp32-64x64-ox.tz2                                          
+‎rxl_vocab.txt                                                          
+‎gfpf-v1-fp16-48x48-ov.tz2                                              
+‎dswn_enc-v1-fp32-1024x1024-ox.tz2                                      
+‎irwn_enc-v2-fp32-512x512-ox.tz2                                        
+‎gde_ap-v1-fp16-64x64-rev2-ox.tz2                                       
+‎rxl_merges.txt                                                         
+‎sdi_embed0.bin                                                         
+‎tpn_embeds.bin                                                         
+‎default_prompt.bin                                                     
+‎ldclc-v1-fp16-64x64-ox.tz2                                             
+‎ldclc-v1-fp16-96x96-ox.tz2                                             
+‎ldclc-v1-fp32-64x64-ox.tz2                                             
+‎lmx-v1-fp16-512x512-ov.tz2                                             
+‎lmx-v1-fp32-512x512-ox.tz2                                             
+‎gfclc-v1-fp32-512x512-ov-11.tz2                                        
+‎clc-v2-fp32-512x512-ov.tz2                                             
+‎gclc-v1-fp16-96x96-2x-ov.tz2                                           
+‎gclc-v1-fp16-96x96-4x-ov.tz2                                           
+‎gclc-v1-fp16-128x128-2x-ov.tz2                                         
+‎gclc-v1-fp16-128x128-4x-ov.tz2                                         
+‎gclc-v1-fp16-192x192-2x-ov.tz2                                         
+‎gclc-v1-fp16-192x192-4x-ov.tz2                                         
+‎gclc-v1-fp32-192x192-1x-ov.tz2                                         
+‎gclc-v1-fp32-192x192-2x-ov.tz2                                         
+‎gclc-v1-fp32-192x192-4x-ov.tz2                                         
+‎ldclc-v1-fp16-64x64-ov.tz2                                             
+‎expog-v1-fp16-512x512-1x-ox.tz2                                        
+‎clc-v3-fp16-512x512-ox.tz2                                             
+‎clc-v3-fp32-512x512-ox.tz2                                             
+‎expog-v1-fp16-512x512-1x-ov.tz2                                        
+‎gclc-v1-fp32-96x96-2x-ox.tz2                                           
+‎gclc-v1-fp32-96x96-4x-ox.tz2                                           
+‎gclc-v1-fp32-128x128-2x-ox.tz2                                         
+‎gclc-v1-fp32-128x128-4x-ox.tz2                                         
+‎gclc-v1-fp32-192x192-1x-ox.tz2                                         
+‎gclc-v1-fp32-192x192-2x-ox.tz2                                         
+‎gclc-v1-fp32-192x192-4x-ox.tz2                                         
+‎gfclc-v1-fp32-512x512-ov-11.tz                                         
+‎ldclc-v1-fp16-64x64-ox.tz                                              
+‎gclc-v1-fp16-128x128-2x-ov.tz                                          
+‎gclc-v1-fp16-128x128-4x-ov.tz                                          
+‎gclc-v1-fp16-192x192-2x-ov.tz                                          
+‎gclc-v1-fp16-192x192-4x-ov.tz                                          
+‎gclc-v1-fp32-128x128-2x-ox.tz                                          
+‎gclc-v1-fp32-128x128-4x-ox.tz                                          
+‎gclc-v1-fp32-192x192-1x-ov.tz                                          
+‎gclc-v1-fp32-192x192-2x-ov.tz                                          
+‎gclc-v1-fp32-192x192-4x-ov.tz                                          
+‎ldclc-v1-fp16-64x64-ov.tz                                              
+"""
 
+# Build the embedded filename list
+FILES = []
+
+for line in FILES_RAW.splitlines():
+    name = (
+        line.strip()
+            .replace("\u200e", "")   # Remove hidden Left-to-Right Mark
+            .replace("\ufeff", "")   # Remove UTF-8 BOM if present
+    )
+
+    if name:
+        FILES.append(name)
+
+# Sort alphabetically and remove duplicates
+files = sorted(set(FILES), key=str.lower)
 total = len(files)
-
 def safe_echo(text: str) -> str:
     return (
         text.replace("^", "^^")
@@ -93,8 +431,7 @@ with OUT_BAT.open("w", encoding="utf-8", newline="\r\n") as f:
     f.write("timeout /t 3 /nobreak >nul\n")
     f.write("echo.\n\n")
 
-    for i, file in enumerate(files, start=1):
-        name = file.name
+    for i, name in enumerate(files, start=1):
         label = f"SKIP_{i:04d}"
 
         f.write(f"echo [{i}/{total}] {safe_echo(name)}\n")
