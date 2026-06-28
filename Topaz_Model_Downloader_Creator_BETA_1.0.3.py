@@ -123,3 +123,5 @@ with OUT_BAT.open("w", encoding="utf-8", newline="\r\n") as f:
 
 print(f"Created: {OUT_BAT}")
 print(f"Files added: {total}")
+
+input("\nPress Enter to exit...")
