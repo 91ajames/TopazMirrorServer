@@ -1,8 +1,0 @@
-# place this in your C:\Windows\System32\drivers\etc\host - replace or add to host by editing with Admin Use.
-# replace IP's when neccesarily.
-
-192.168.25.1 models.topazlabs.com
-192.168.25.1 et.topazlabs.com
-192.168.25.1 image-models.topazlabs.com
-192.168.25.1 models-r2.topazlabs.com
-192.168.25.1 models-bal.topazlabs.com
