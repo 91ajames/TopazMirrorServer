@@ -46,6 +46,7 @@ This project recreates the expected download structure locally, allowing the sof
 
 Preserve the availability of Topaz AI models for future installations, even if official download sources change or become unavailable.
 
+![github-small](https://github.com/91ajames/Topaz-Offline-Download-Server/blob/main/Topaz%20Model%20Downloader%205.0.3.png)
 
 ![github-small](https://github.com/91ajames/Topaz-Offline-Download-Server/blob/main/Topaz%20Model%20Downloader%205.0.0.png)
 
