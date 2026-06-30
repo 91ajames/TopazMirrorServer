@@ -2,7 +2,7 @@ import subprocess
 
 from pathlib import Path
 
-VERSION = "5.0.3"
+VERSION = "5.0.5"
 VERSION_FILE = VERSION.replace(" ", "_")
 
 MIRROR_ROOT = Path(r"C:\TopazMirror")
@@ -509,7 +509,7 @@ with OUT_BAT.open("w", encoding="utf-8", newline="\r\n") as f:
 
     f.write("echo.\n")
     f.write("echo ===========================================\n")
-    f.write("echo        Neuroserver Download Section\n")
+    f.write("echo     Topaz Neuroserver Downloader\n")
     f.write("echo ===========================================\n")
     f.write("echo.\n")
 
